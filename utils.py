@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import random
+import re
 
 def load_css(file_name="style.css"):
     with open(file_name) as f:
@@ -120,3 +121,69 @@ def get_logo_svg(size=40):
 <rect x="60" y="45" width="2" height="2" fill="#FFF" opacity="0.6" />
 <rect x="58" y="55" width="2" height="2" fill="#FFF" opacity="0.9" />
 </svg>"""
+
+# --- QUANTUM AI LOGIC ---
+
+class ObserverAI:
+    def __init__(self):
+        # The Quantum Knowledge Base
+        self.knowledge_base = {
+            # Quantum Physics
+            r"superposition": "In quantum mechanics, superposition is the ability of a quantum system to be in multiple states at the same time until it is measured. In this app, your posts exist in a superposition of TRUE and FALSE until the community votes.",
+            r"entangle(ment)?": "Quantum entanglement is a physical phenomenon where particles remain connected so that the physical properties of one are independent of the other, even when separated by large distances. Here, 'Entanglement Alerts' notify you when someone else posts a similar anomaly.",
+            r"decoherence": "Quantum decoherence is the loss of quantum coherence. In this system, it represents the breakdown of consensus reality—when too many people observe a glitch, reality stabilizes or 'decoheres'.",
+            r"particle|atom": "Particles are the fundamental units of matter. We track Protons (Truth) and Electrons (Deception/Hoax) to measure the stability of a reported anomaly.",
+            r"wave function": "A mathematical description of the quantum state of an isolated quantum system. It describes the probability of finding a particle in a certain state.",
+            r"observer effect": "The theory that the mere observation of a phenomenon inevitably changes that phenomenon. By logging into this app, you are an Observer, and your votes change the reality rating of a post.",
+            r"schrodinger": "Schrödinger's Cat is a thought experiment. A cat in a box is simultaneously alive and dead. Similarly, every unverified post here is both a Hoax and Real until you vote.",
+            r"tunneling": "Quantum tunneling allows particles to pass through potential barriers. This explains how 'glitch' entities might move through solid walls.",
+            
+            # App Navigation / Help
+            r"(how|where).*post": "To report a breach: Go to the 'HOME' tab and click the 'REPORT BREACH +' button at the top right.",
+            r"(how|where).*vote": "You can vote on any post in the FEED. Click 'Real (+)' to add a Proton or 'Fake (-)' to add an Electron.",
+            r"what.*(proton|electron)": "PROTONS (+) indicate you believe the evidence is authentic. ELECTRONS (-) indicate you believe it is a hoax or system error.",
+            r"resonance meter": "The Resonance Meter visualizes the community consensus. Left (Red) means Unstable/Hoax. Right (Green) means Stable/Truth. Center is Neutral.",
+            r"profile|avatar": "Go to the 'PROFILE' tab to view your stats, edit your bio, or update your avatar.",
+            r"archive|categories": "The Archives are located at the top of the Home Feed. Click on icons like UFO, Cryptid, or Time to filter specific anomalies.",
+            r"friend|connect": "Go to the 'OBSERVERS' tab to see connection requests or chat with other agents.",
+            
+            # General Chat
+            r"hello|hi|hey": "Greetings, Observer. I am connected to the Quantum Field. How may I assist your navigation?",
+            r"who are you": "I am The Observer. An AI construct designed to monitor decoherence events and guide agents like yourself through the Fold.",
+            r"help": "I can explain quantum concepts (try 'What is superposition?') or help you navigate (try 'How do I post?').",
+            r"thank": "You are welcome. Keep watching the static.",
+            r"real|truth": "Truth is a variable. We merely aggregate the data points."
+        }
+        
+        self.fallback_responses = [
+            "I am analyzing the quantum foam for that query... The signal is ambiguous.",
+            "My databanks are searching the multiverse... Please rephrase your query.",
+            "That concept is currently encrypted in a higher dimension.",
+            "I detect a query, but the wave function has collapsed. Try asking about 'superposition' or 'how to post'.",
+            "Accessing the Akashic Records... Data corrupted. Please ask about app functions or quantum theory."
+        ]
+
+    def get_response(self, user_msg):
+        """
+        Intelligent response generation using regex matching against the knowledge base.
+        Simulates 'Internet' connection delay.
+        """
+        msg = user_msg.lower()
+        
+        # Simulate processing delay (Thinking)
+        time.sleep(0.5) 
+        
+        # Check Knowledge Base
+        for pattern, response in self.knowledge_base.items():
+            if re.search(pattern, msg):
+                return f"🔍 **ANALYSIS:** {response}"
+        
+        # Check for calculation requests (simple math as a 'smart' feature)
+        if re.search(r"calculate|math", msg):
+            return "🧮 I can process quantum probability, but simple arithmetic is trivial. I focus on the physics of reality."
+
+        # Fallback
+        return f"📡 **SIGNAL WEAK:** {random.choice(self.fallback_responses)}"
+
+# Singleton Instance
+observer_ai = ObserverAI()

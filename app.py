@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 import random
-from utils import load_css, render_glitch_header, render_glass_card, render_resonance_meter, render_entanglement_alert, render_terminal_boot, get_logo_svg
+from utils import load_css, render_glitch_header, render_glass_card, render_resonance_meter, render_entanglement_alert, render_terminal_boot, get_logo_svg, observer_ai
 import auth
 
 # --- PAGE CONFIG ---
@@ -83,34 +83,9 @@ if 'notification_settings' not in st.session_state:
 
 def get_ai_response(user_msg):
     """
-    Simulates the AI Observer response with context awareness.
+    Simulates the AI Observer response using the upgraded Knowledge Base.
     """
-    msg = user_msg.upper()
-    
-    if "HELLO" in msg or "HI" in msg:
-        return "CONNECTION ESTABLISHED. I AM LISTENING."
-    elif "REAL" in msg or "TRUTH" in msg:
-        return "REALITY IS A CONSENSUS HALLUCINATION. YOUR INPUT HAS BEEN WEIGHED."
-    elif "GLITCH" in msg or "BUG" in msg:
-        return "ANOMALY DETECTED. TRACING SOURCE COORDINATES..."
-    elif "HELP" in msg:
-        return "COMMANDS: REPORT BREACH, CHECK SYNC, OBSERVE."
-    elif "WHO ARE YOU" in msg:
-        return "I AM THE OBSERVER. I AM THE LOG."
-    elif "BYE" in msg or "EXIT" in msg:
-        return "LINK SEVERED. YOU REMAIN UNDER SURVEILLANCE."
-    
-    responses = [
-        "I AM WATCHING. REALITY IS STABLE.",
-        "YOUR DATA HAS BEEN LOGGED IN THE FOLD.",
-        "DECOHERENCE DETECTED IN YOUR SECTOR.",
-        "WHY DO YOU RESIST THE SYNC?",
-        "THE SYSTEM ACKNOWLEDGES YOUR INPUT.",
-        "PROCEED WITH CAUTION. ENTANGLEMENT IMMINENT.",
-        "I SEE YOU.",
-        "CALCULATING PROBABILITY OF BREACH... 99%."
-    ]
-    return random.choice(responses)
+    return observer_ai.get_response(user_msg)
 
 def add_notification(n_type, message):
     """
@@ -211,11 +186,23 @@ def login_view():
 By proceeding, you acknowledge that observed reality is subject to change based on quantum consensus.
 </p>""")
         
-        if st.button("AUTHENTICATE BIOMETRICS (GOOGLE)"):
-            with st.spinner("HANDSHAKING WITH GATEKEEPER..."):
-                time.sleep(1.5)
-                auth.mock_login() 
-                st.rerun() 
+        with st.form("login_form"):
+            username = st.text_input("CODENAME", placeholder="Enter Agent ID")
+            password = st.text_input("PASSPHRASE", type="password", placeholder="******")
+            remember = st.checkbox("MAINTAIN QUANTUM LINK (STAY LOGGED IN)")
+            
+            if st.form_submit_button("AUTHENTICATE"):
+                with st.spinner("HANDSHAKING WITH GATEKEEPER..."):
+                    time.sleep(1.0)
+                    if auth.verify_login(username.lower(), password):
+                        auth.login_user(username, remember_me=remember)
+                        st.success("ACCESS GRANTED.")
+                        time.sleep(0.5)
+                        st.rerun()
+                    else:
+                        st.error("ACCESS DENIED. INCORRECT CREDENTIALS.")
+                        
+        st.markdown("<div style='text-align: center; font-size: 0.8em; color: #444;'>Default Access: agent_smith / matrix</div>", unsafe_allow_html=True) 
 
 def app_bar():
     """Top App Bar: Logo, Search, Messenger"""
