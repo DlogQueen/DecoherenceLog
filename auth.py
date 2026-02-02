@@ -1,71 +1,62 @@
 import streamlit as st
-import time
-import secrets
+import database
 
-# Mock User Database
-USERS = {
-    "admin": "password123",
-    "agent_smith": "matrix",
-    "void_runner": "glitch",
-    "architect": "matrix_source_code"
-}
+# Mock Authentication for immediate use
+def check_password():
+    """Returns `True` if the user had the correct password."""
+    return st.session_state.get("authenticated", False)
 
-def verify_login(username, password):
-    """Verifies username and password against mock DB"""
-    if username in USERS and USERS[username] == password:
-        return True
-    return False
-
-def login_user(username, remember_me=False):
-    """Sets session state for logged in user"""
-    st.session_state['logged_in'] = True
-    st.session_state['user'] = {
-        'name': username,
-        'resonance_score': 0, # Default, will load from profile later
-        'bio': 'Encrypted'
-    }
+def login_user(username, email="agent@decoherence.log"):
+    st.session_state["authenticated"] = True
+    st.session_state["username"] = username
+    st.session_state["email"] = email
     
-    if remember_me:
-        # Simple "Remember Me" implementation using Query Params
-        # In a real app, use a secure HTTP-only cookie
-        token = secrets.token_urlsafe(16)
-        # Store token mapping (Mock)
-        st.session_state['auth_token'] = token
-        st.query_params['auth_token'] = token
+    # Ensure user exists in DB
+    user = database.get_user_by_email(email)
+    if not user:
+        uid = database.create_user(username, email)
+        st.session_state["user_id"] = uid
+        st.session_state["role"] = "user"
     else:
-        # Clear token if not remembering
-        if 'auth_token' in st.query_params:
-            del st.query_params['auth_token']
+        st.session_state["user_id"] = user['id']
+        st.session_state["role"] = user['role']
 
-def check_auth():
-    """Checks if user is logged in via Session or Token"""
+def logout_user():
+    st.session_state["authenticated"] = False
+    st.session_state["username"] = None
+    st.session_state["user_id"] = None
+    st.session_state["role"] = None
+
+def get_current_user():
+    if st.session_state.get("authenticated"):
+        return {
+            "id": st.session_state.get("user_id"),
+            "username": st.session_state.get("username"),
+            "email": st.session_state.get("email"),
+            "role": st.session_state.get("role")
+        }
+    return None
+
+def is_admin():
+    user = get_current_user()
+    return user and user['role'] == 'admin'
+
+# --- GOOGLE AUTH PLACEHOLDER ---
+# In a production environment, we would use:
+# from google_auth_oauthlib.flow import Flow
+# But for this prototype, we simulate the "Handshake".
+
+def google_login_btn():
+    """
+    Renders the Google Login button. 
+    If secrets are missing, it falls back to a simulated login.
+    """
+    # Check for secrets
+    if "google" in st.secrets:
+        # Implement real OAuth flow here if keys exist
+        pass
     
-    # 1. Check Session State
-    if st.session_state.get('logged_in', False):
+    # Simulation for the prototype
+    if st.button("AUTHENTICATE BIOMETRICS [GOOGLE LINK]", type="primary", use_container_width=True):
         return True
-        
-    # 2. Check "Remember Me" Token (Simple Mock)
-    # In reality, you'd validate this token against a DB
-    query_params = st.query_params
-    if 'auth_token' in query_params:
-        token = query_params['auth_token']
-        # For this mock, we just accept any token that looks like ours (length check)
-        # and auto-login as a default user if valid
-        if len(token) > 10: 
-            st.session_state['logged_in'] = True
-            st.session_state['user'] = {
-                'name': 'Returning_Agent',
-                'resonance_score': 88,
-                'bio': 'Auto-Login Successful'
-            }
-            st.toast("AUTO-LOGIN SUCCESSFUL. WELCOME BACK.")
-            return True
-            
     return False
-
-def logout():
-    st.session_state['logged_in'] = False
-    st.session_state['user'] = {}
-    if 'auth_token' in st.query_params:
-        del st.query_params['auth_token']
-    st.rerun()
